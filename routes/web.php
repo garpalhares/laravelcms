@@ -11,6 +11,9 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', 'Site\HomeController@index');
+
+Route::prefix('panel')->group(function(){ 
+	Route::get('/', 'Admin\HomeController@index')->name('admin');
+	Route::get('login', 'Admin\Auth\LoginController@index')->name('login');
 });
