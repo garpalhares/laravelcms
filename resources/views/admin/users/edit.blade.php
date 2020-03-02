@@ -20,8 +20,6 @@
 				@endforeach
 			</ul>
 		</div>
-	@else
-
 	@endif
 
 	<div class="card">
