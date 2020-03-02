@@ -187,6 +187,7 @@ return [
             'text'        => 'Meus Usuários',
             'url'         => 'panel/users',
             'icon'        => 'far fa-fw fa-file',
+            'can'         => 'edit-users-permission',
         ],
         ['header' => 'account_settings'],
         [
