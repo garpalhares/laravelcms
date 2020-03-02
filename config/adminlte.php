@@ -189,12 +189,19 @@ return [
             'icon'        => 'far fa-fw fa-file',
             'can'         => 'edit-users-permission',
         ],
-        ['header' => 'account_settings'],
+        ['header' => 'Configurações'],
         [
-            'text' => 'profile',
-            'url'  => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
+            'text'      => 'Configs. do Site',
+            'url'       => 'panel/settings',
+            'icon'      => 'far fa-fw fa-file',
         ],
+        [
+            'text'      => 'Meu Perfil',
+            'url'       => 'panel/profile',
+            'icon'      => 'far fa-fw fa-user',
+        ],
+        
+
     ],
 
     /*
