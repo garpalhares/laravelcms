@@ -184,7 +184,7 @@ return [
             'icon'        => 'far fa-fw fa-file',
         ],
         [
-            'text'        => 'Meu Usuários',
+            'text'        => 'Meus Usuários',
             'url'         => 'panel/users',
             'icon'        => 'far fa-fw fa-file',
         ],

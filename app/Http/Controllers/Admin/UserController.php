@@ -5,9 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\User;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,9 +24,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::paginate(1);
+        $userLoggedID = intval(Auth::id());
 
-        return view('admin.users.index', ['users' => $users]);
+        return view('admin.users.index', [
+            'users' => $users,
+            'userLoggedID' => $userLoggedID,
+        ]);
     }
 
     /**
@@ -27,7 +40,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.users.create');
     }
 
     /**
@@ -38,7 +51,25 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->only(['name', 'email', 'password', 'password_confirmation']);
+
+        $validator = Validator::make($data, [
+            'name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'string', 'max:100', 'unique:users'],
+            'password' => ['required', 'string', 'min:3', 'confirmed']
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('users.create')->withErrors($validator)->withInput();
+        }
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
+
+        return redirect()->route('users.index');
     }
 
     /**
@@ -60,7 +91,14 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        //
+        $user = User::find($id);
+
+        if ($user) {
+            return view('admin.users.edit', ['user' => $user]);
+        }
+
+        return redirect()->route('users.index');
+        
     }
 
     /**
@@ -72,7 +110,57 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $user = User::find($id);
+
+        if ($user) {
+            $data = $request->only(['name', 'email', 'password', 'password_confirmation']);
+
+            $validator = Validator::make([
+                'name' => $data['name'],
+                'email' => $data['email']
+            ], [
+                'name' => ['required', 'string', 'max:100'],
+                'email' => ['required', 'string', 'email', 'max:100'],
+            ]);
+
+            $user->name = $data['name'];
+
+            if ($user->email !== $data['email']) {
+                $hasEmail = User::where('email', $data['email'])->get();
+                if (count($hasEmail) === 0) {
+                    $user->email = $data['email'];
+                } else {
+                    $validator->errors()->add('email', __('validation.unique', [
+                        'attribute' => 'email',
+                    ]));
+                }
+            }
+
+            if (!empty($data['password'])) {
+                if (strlen($data['password']) >= 3) {
+                    if ($data['password'] === $data['password_confirmation']) {
+                        $user->password = Hash::make($data['password']);
+                    } else {
+                        $validator->errors()->add('password', __('validation.confirmed', [
+                            'attribute' => 'password',
+                        ])); 
+                    }
+                } else {
+                    $validator->errors()->add('password', __('validation.min.string', [
+                        'attribute' => 'password',
+                        'min' => 3,
+                    ])); 
+                }
+            }
+
+            if (count($validator->errors()) > 0) {
+                return redirect()->route('users.edit', ['user' => $id])->withErrors($validator);
+            }
+            
+            $user->save();
+        }
+
+        return redirect()->route('users.index');
     }
 
     /**
@@ -83,6 +171,13 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $userLoggedID = intval(Auth::id());
+
+        if ($userLoggedID !== intval($id)) {
+            $user = User::find($id);
+            $user->delete();
+        }
+
+        return redirect()->route('users.index');
     }
 }
