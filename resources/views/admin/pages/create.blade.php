@@ -38,7 +38,7 @@
 				<div class="form-group row">
 					<label for="" class="col-sm-3 col-form-label">Corpo da Página</label>
 					<div class="col-sm-9">
-						<textarea name="body" class="form-control" style="height: 300px;">{{old('body')}}</textarea>
+						<textarea name="body" class="form-control bodyfield" style="height: 300px;">{{old('body')}}</textarea>
 					</div>
 				</div>
 
@@ -51,5 +51,22 @@
 			</form>
 		</div>
 	</div>
+
+	<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+  	<script>
+  		tinymce.init({
+  			selector:'textarea.bodyfield',
+  			height: 300,
+  			menubar: false,
+  			plugins: ['link', 'table', 'image', 'autoresize', 'lists'],
+  			toolbar:'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | table | link image | bullist numlist',
+  			content_css: [
+  				'{{asset('assets/css/content.css')}}'
+  			],
+  			images_upload_url: '{{route('imageupload')}}',
+  			images_upload_credentials: true,
+  			convert_urls: false,
+  		})
+  	</script>
 
 @endsection
